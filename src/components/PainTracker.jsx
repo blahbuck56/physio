@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 const painLabels = ['None', 'Minimal', 'Mild', 'Moderate', 'Severe', 'Worst'];
 const painColors = [
-  'bg-emerald-400', 'bg-emerald-300', 'bg-yellow-400',
-  'bg-amber-400', 'bg-orange-500', 'bg-red-500'
+  'bg-emerald-500', 'bg-emerald-400', 'bg-yellow-500',
+  'bg-amber-500', 'bg-orange-500', 'bg-red-500'
 ];
 
 export default function PainTracker() {
@@ -40,7 +40,7 @@ export default function PainTracker() {
         onChange={(e) => setPain(Number(e.target.value))}
         className="w-full mb-1"
         style={{
-          background: `linear-gradient(to right, #6EE7B7 0%, #EF4444 100%)`
+          background: `linear-gradient(to right, #059669 0%, #DC2626 100%)`
         }}
       />
       <div className="flex justify-between text-xs text-[var(--color-text-muted)] mb-4">
