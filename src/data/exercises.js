@@ -2,324 +2,584 @@ const exercises = [
   {
     id: 1,
     name: "Chin Tucks",
+    slug: "chin-tucks",
     category: "neck",
+    bodyRegion: "neck",
     difficulty: "beginner",
-    duration: "30s hold",
-    reps: "10 reps x 3 sets",
-    description: "Strengthens deep neck flexors and corrects forward head posture.",
-    instructions: [
-      "Sit or stand with your back straight",
-      "Gently draw your chin straight back, creating a double chin",
-      "Hold for 3 seconds, feeling a stretch at the base of your skull",
-      "Return to starting position",
-      "Keep your eyes level — don't tilt your head up or down"
+    duration: 30,
+    reps: "10 reps",
+    sets: 3,
+    equipment: "none",
+    purpose: "Corrects forward head posture",
+    description: "Strengthens deep neck flexors and corrects forward head posture — one of the most common causes of neck pain and headaches.",
+    steps: [
+      "Sit or stand tall with your back straight",
+      "Gently pull your chin straight back",
+      "Create a \"double chin\" feeling",
+      "Hold for 3 seconds",
+      "Slowly release forward"
     ],
     targetMuscles: ["Deep cervical flexors", "Suboccipitals"],
-    commonMistakes: ["Tilting head down instead of retracting", "Jutting jaw forward"],
-    evidenceNote: "Supported by research for cervicogenic headache and neck pain (Jull et al., 2002)."
+    commonMistakes: ["Tilting head down instead of retracting chin", "Jutting jaw forward"],
+    cautions: ["Stop if you feel sharp pain or dizziness"],
+    evidenceNote: "Supported by research for cervicogenic headache and neck pain (Jull et al., 2002).",
+    regression: "Perform lying down with head on pillow",
+    progression: "Add gentle resistance with fingertips on chin",
+    illustration: "chinTuck",
+    media: {
+      type: "illustration",
+      primaryUrl: null, // placeholder for licensed video
+      thumbnailUrl: null,
+      alternateAngleUrl: null,
+      attribution: null,
+      source: null,
+      license: null,
+    },
   },
   {
     id: 2,
-    name: "Scapular Squeezes",
-    category: "shoulder",
+    name: "Neck Side Stretch",
+    slug: "neck-side-stretch",
+    category: "neck",
+    bodyRegion: "neck",
     difficulty: "beginner",
-    duration: "5s hold",
-    reps: "15 reps x 3 sets",
-    description: "Activates mid and lower trapezius to improve shoulder blade stability.",
-    instructions: [
-      "Sit or stand with arms at your sides",
-      "Squeeze your shoulder blades together and slightly down",
-      "Hold for 5 seconds",
-      "Slowly release back to the starting position",
-      "Avoid shrugging your shoulders upward"
+    duration: 30,
+    reps: "3 each side",
+    sets: 2,
+    equipment: "none",
+    purpose: "Releases neck and upper trap tension",
+    description: "Gently stretches the side of the neck to relieve tension headaches and stiffness from desk work.",
+    steps: [
+      "Sit tall in a chair",
+      "Tilt your right ear toward your right shoulder",
+      "Use your right hand to gently add pressure",
+      "Hold for 15 seconds",
+      "Switch to the other side"
     ],
-    targetMuscles: ["Mid trapezius", "Rhomboids", "Lower trapezius"],
-    commonMistakes: ["Shrugging shoulders toward ears", "Arching the lower back"],
-    evidenceNote: "Key component of postural correction programs for upper crossed syndrome."
+    targetMuscles: ["Upper trapezius", "Levator scapulae", "Scalenes"],
+    commonMistakes: ["Raising the shoulder instead of tilting the head", "Pulling too aggressively"],
+    cautions: ["Avoid if you have cervical radiculopathy symptoms"],
+    evidenceNote: "Effective for tension-type headache relief and cervical mobility.",
+    regression: "Skip the hand pressure — just tilt gently",
+    progression: "Extend opposite arm down to increase the stretch",
+    illustration: "neckStretch",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
   },
   {
     id: 3,
-    name: "Wall Angels",
+    name: "Scapular Squeezes",
+    slug: "scapular-squeezes",
     category: "shoulder",
-    difficulty: "intermediate",
-    duration: "2s per rep",
-    reps: "10 reps x 3 sets",
-    description: "Improves shoulder mobility and thoracic extension against a wall.",
-    instructions: [
-      "Stand with your back flat against a wall, feet 6 inches from the wall",
-      "Press your lower back, upper back, and head against the wall",
-      "Place arms in a 'goalpost' position (elbows at 90°) against the wall",
-      "Slowly slide your arms up overhead, keeping contact with the wall",
-      "Slide back down to the starting position"
+    bodyRegion: "shoulder",
+    difficulty: "beginner",
+    duration: 5,
+    reps: "15 reps",
+    sets: 3,
+    equipment: "none",
+    purpose: "Improves shoulder blade stability",
+    description: "Activates mid and lower trapezius to improve shoulder blade stability and reduce upper back tension.",
+    steps: [
+      "Sit or stand with arms at your sides",
+      "Squeeze shoulder blades together",
+      "Pull them slightly downward",
+      "Hold for 5 seconds",
+      "Slowly release"
     ],
-    targetMuscles: ["Serratus anterior", "Lower trapezius", "Rotator cuff"],
-    commonMistakes: ["Arching lower back off the wall", "Losing arm contact with wall"],
-    evidenceNote: "Effective for overhead athletes and desk workers with limited shoulder mobility."
+    targetMuscles: ["Mid trapezius", "Rhomboids", "Lower trapezius"],
+    commonMistakes: ["Shrugging shoulders toward ears", "Arching the lower back"],
+    cautions: ["Keep breathing normally throughout"],
+    evidenceNote: "Key component of postural correction programs for upper crossed syndrome.",
+    regression: "Reduce hold time to 2 seconds",
+    progression: "Hold a resistance band between hands",
+    illustration: "scapularSqueeze",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
   },
   {
     id: 4,
-    name: "Cat-Cow Stretch",
-    category: "back",
-    difficulty: "beginner",
-    duration: "3s each position",
-    reps: "10 cycles x 2 sets",
-    description: "Mobilizes the entire spine through flexion and extension.",
-    instructions: [
-      "Start on hands and knees, wrists under shoulders, knees under hips",
-      "Inhale: drop your belly, lift your chest and tailbone (Cow)",
-      "Exhale: round your spine, tuck your chin and pelvis (Cat)",
-      "Move slowly and rhythmically with your breath",
-      "Focus on moving one vertebra at a time"
-    ],
-    targetMuscles: ["Erector spinae", "Rectus abdominis", "Multifidus"],
-    commonMistakes: ["Moving too quickly", "Only moving at hips instead of segmentally"],
-    evidenceNote: "Widely used in yoga therapy and clinical rehab for spinal mobility (Cramer et al., 2013)."
-  },
-  {
-    id: 5,
-    name: "Bird-Dog",
-    category: "back",
-    difficulty: "intermediate",
-    duration: "5s hold",
-    reps: "10 reps each side x 3 sets",
-    description: "Trains core stability and spinal control through contralateral limb movement.",
-    instructions: [
-      "Start on hands and knees in a neutral spine position",
-      "Brace your core gently (think about tightening a belt)",
-      "Simultaneously extend your right arm forward and left leg back",
-      "Hold for 5 seconds, keeping hips level",
-      "Return to start and repeat on the opposite side"
-    ],
-    targetMuscles: ["Multifidus", "Transverse abdominis", "Gluteus maximus", "Erector spinae"],
-    commonMistakes: ["Rotating hips when extending leg", "Losing neutral spine"],
-    evidenceNote: "Core exercise validated by McGill (2007) for low back pain rehabilitation."
-  },
-  {
-    id: 6,
-    name: "Dead Bug",
-    category: "core",
-    difficulty: "intermediate",
-    duration: "3s per rep",
-    reps: "8 reps each side x 3 sets",
-    description: "Builds deep core stability while maintaining a neutral lumbar spine.",
-    instructions: [
-      "Lie on your back, arms pointing to the ceiling, knees at 90°",
-      "Press your lower back firmly into the floor",
-      "Slowly extend your right arm overhead and left leg out straight",
-      "Return to start position without letting your back arch",
-      "Repeat on the opposite side"
-    ],
-    targetMuscles: ["Transverse abdominis", "Rectus abdominis", "Diaphragm"],
-    commonMistakes: ["Lower back arching off the floor", "Moving too fast"],
-    evidenceNote: "Recommended for motor control retraining in chronic low back pain."
-  },
-  {
-    id: 7,
-    name: "Clamshells",
-    category: "hip",
-    difficulty: "beginner",
-    duration: "2s hold",
-    reps: "15 reps each side x 3 sets",
-    description: "Isolates the gluteus medius for hip stability and knee alignment.",
-    instructions: [
-      "Lie on your side with knees bent to 45° and feet together",
-      "Keep your pelvis stable — don't roll backward",
-      "Lift your top knee as high as you can without moving your pelvis",
-      "Hold briefly at the top, then slowly lower",
-      "Add a resistance band above the knees for progression"
-    ],
-    targetMuscles: ["Gluteus medius", "Gluteus minimus", "Deep hip rotators"],
-    commonMistakes: ["Rolling pelvis backward", "Using momentum instead of control"],
-    evidenceNote: "High gluteus medius activation confirmed by EMG studies (Distefano et al., 2009)."
-  },
-  {
-    id: 8,
-    name: "Glute Bridge",
-    category: "hip",
-    difficulty: "beginner",
-    duration: "3s hold",
-    reps: "12 reps x 3 sets",
-    description: "Activates glutes and hamstrings while teaching hip extension control.",
-    instructions: [
-      "Lie on your back with knees bent, feet flat and hip-width apart",
-      "Push through your heels to lift your hips toward the ceiling",
-      "Squeeze your glutes at the top, forming a straight line from knees to shoulders",
-      "Hold for 3 seconds",
-      "Lower slowly back to the starting position"
-    ],
-    targetMuscles: ["Gluteus maximus", "Hamstrings", "Core stabilizers"],
-    commonMistakes: ["Hyperextending the lower back at the top", "Pushing through toes instead of heels"],
-    evidenceNote: "Foundational exercise in ACL rehab and hip strengthening protocols."
-  },
-  {
-    id: 9,
-    name: "Standing Calf Raises",
-    category: "knee",
-    difficulty: "beginner",
-    duration: "2s hold",
-    reps: "15 reps x 3 sets",
-    description: "Strengthens the gastrocnemius and soleus for ankle stability.",
-    instructions: [
-      "Stand with feet hip-width apart, holding a wall for balance",
-      "Rise up onto your toes as high as possible",
-      "Hold at the top for 2 seconds",
-      "Lower slowly back down with control",
-      "For progression: perform on one leg at a time"
-    ],
-    targetMuscles: ["Gastrocnemius", "Soleus"],
-    commonMistakes: ["Rising too quickly", "Not achieving full range of motion"],
-    evidenceNote: "Eccentric calf raises are gold-standard for Achilles tendinopathy (Alfredson protocol)."
-  },
-  {
-    id: 10,
-    name: "Straight Leg Raise",
-    category: "knee",
-    difficulty: "beginner",
-    duration: "3s hold",
-    reps: "10 reps each leg x 3 sets",
-    description: "Strengthens the quadriceps without bending the knee — ideal post-surgery.",
-    instructions: [
-      "Lie on your back with one knee bent, foot flat on the floor",
-      "Keep the other leg straight and tighten the quad muscle",
-      "Lift the straight leg to the height of the bent knee",
-      "Hold for 3 seconds at the top",
-      "Lower slowly and repeat"
-    ],
-    targetMuscles: ["Quadriceps (especially VMO)", "Hip flexors"],
-    commonMistakes: ["Bending the knee of the working leg", "Lifting too high"],
-    evidenceNote: "Staple exercise in post-operative knee rehab (ACL, meniscus, TKR)."
-  },
-  {
-    id: 11,
-    name: "Towel Scrunches",
-    category: "ankle",
-    difficulty: "beginner",
-    duration: "30s",
-    reps: "3 sets each foot",
-    description: "Strengthens intrinsic foot muscles for arch support and balance.",
-    instructions: [
-      "Sit in a chair with a towel flat on the floor under your foot",
-      "Use your toes to scrunch the towel toward you",
-      "Spread the towel back out and repeat",
-      "Keep your heel planted on the ground throughout",
-      "Progress by placing a small weight on the towel"
-    ],
-    targetMuscles: ["Intrinsic foot muscles", "Flexor digitorum brevis", "Flexor hallucis brevis"],
-    commonMistakes: ["Lifting the heel", "Using the whole foot instead of just the toes"],
-    evidenceNote: "Shown to improve arch height and reduce plantar fasciitis symptoms."
-  },
-  {
-    id: 12,
-    name: "Ankle Alphabet",
-    category: "ankle",
-    difficulty: "beginner",
-    duration: "2 min",
-    reps: "1-2 sets each foot",
-    description: "Improves ankle range of motion in all planes of movement.",
-    instructions: [
-      "Sit with your leg extended or cross your ankle over the opposite knee",
-      "Using your big toe as a pointer, trace each letter of the alphabet",
-      "Move only your ankle — keep your leg still",
-      "Go through A to Z in capital letters",
-      "Perform slowly and with full range of motion"
-    ],
-    targetMuscles: ["Tibialis anterior", "Peroneals", "Ankle joint capsule"],
-    commonMistakes: ["Moving the entire leg instead of just the ankle", "Rushing through letters"],
-    evidenceNote: "Common early-stage exercise in ankle sprain rehabilitation protocols."
-  },
-  {
-    id: 13,
     name: "Pec Doorway Stretch",
+    slug: "pec-doorway-stretch",
     category: "shoulder",
+    bodyRegion: "shoulder",
     difficulty: "beginner",
-    duration: "30s hold",
-    reps: "3 reps each side",
-    description: "Stretches the pectoralis major and minor to counteract rounded shoulders.",
-    instructions: [
-      "Stand in a doorway with your arm bent at 90° against the frame",
-      "Step through with the same-side foot until you feel a chest stretch",
-      "Keep your core engaged — don't arch your lower back",
-      "Hold for 30 seconds, breathing deeply",
-      "Adjust arm height to target different pec fibers"
+    duration: 30,
+    reps: "3 each side",
+    sets: 2,
+    equipment: "Doorway",
+    purpose: "Opens up a tight chest",
+    description: "Stretches the pectoralis major and minor to counteract rounded shoulders from prolonged sitting.",
+    steps: [
+      "Stand in an open doorway",
+      "Place your arm on the door frame at 90°",
+      "Step forward with the same-side foot",
+      "Feel the stretch across your chest",
+      "Hold for 30 seconds, breathe deeply"
     ],
     targetMuscles: ["Pectoralis major", "Pectoralis minor", "Anterior deltoid"],
     commonMistakes: ["Arching the back to compensate", "Placing arm too high or too low"],
-    evidenceNote: "Recommended for anterior shoulder tightness in postural correction programs."
+    cautions: ["Ease into the stretch — don't force it"],
+    evidenceNote: "Recommended for anterior shoulder tightness in postural correction programs.",
+    regression: "Stand closer to the doorway for a lighter stretch",
+    progression: "Place both arms up for a bilateral stretch",
+    illustration: "pecStretch",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
   },
   {
-    id: 14,
-    name: "Prone Press-Up (McKenzie)",
+    id: 5,
+    name: "Wall Angels",
+    slug: "wall-angels",
+    category: "shoulder",
+    bodyRegion: "shoulder",
+    difficulty: "intermediate",
+    duration: 3,
+    reps: "10 reps",
+    sets: 3,
+    equipment: "Wall",
+    purpose: "Restores overhead shoulder mobility",
+    description: "Improves shoulder mobility and thoracic extension — essential for anyone with desk-related stiffness.",
+    steps: [
+      "Stand with your back flat against a wall",
+      "Place arms in a goalpost position",
+      "Keep your back and arms touching the wall",
+      "Slowly slide arms up overhead",
+      "Slide back down to start"
+    ],
+    targetMuscles: ["Serratus anterior", "Lower trapezius", "Rotator cuff"],
+    commonMistakes: ["Arching lower back off the wall", "Losing arm contact with wall"],
+    cautions: ["Only go as high as you can while maintaining wall contact"],
+    evidenceNote: "Effective for overhead athletes and desk workers with limited shoulder mobility.",
+    regression: "Only raise arms halfway up",
+    progression: "Add light wrist weights",
+    illustration: "wallAngel",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 6,
+    name: "Cat-Cow Stretch",
+    slug: "cat-cow-stretch",
     category: "back",
+    bodyRegion: "back",
     difficulty: "beginner",
-    duration: "3s hold at top",
-    reps: "10 reps x 3 sets",
-    description: "Promotes lumbar extension to centralize discogenic pain.",
-    instructions: [
-      "Lie face down with hands placed under your shoulders",
-      "Slowly press your upper body up, straightening your arms",
-      "Keep your hips and pelvis on the floor",
-      "Hold briefly at the top, then lower back down",
-      "Stop if pain moves further down the leg (peripheralizes)"
+    duration: 3,
+    reps: "10 cycles",
+    sets: 2,
+    equipment: "Yoga mat (optional)",
+    purpose: "Loosens up the entire spine",
+    description: "Mobilizes the entire spine through flexion and extension — one of the best warm-up exercises for any back program.",
+    steps: [
+      "Get on hands and knees",
+      "Inhale: drop belly, lift chest (Cow)",
+      "Exhale: round your back, tuck chin (Cat)",
+      "Move slowly with your breath",
+      "Repeat the flow"
+    ],
+    targetMuscles: ["Erector spinae", "Rectus abdominis", "Multifidus"],
+    commonMistakes: ["Moving too quickly", "Only bending at the hips"],
+    cautions: ["Use a padded surface if knees are sensitive"],
+    evidenceNote: "Widely used in yoga therapy and clinical rehab for spinal mobility (Cramer et al., 2013).",
+    regression: "Reduce range of motion — smaller movements",
+    progression: "Add a child's pose between cycles",
+    illustration: "catCow",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 7,
+    name: "Prone Press-Up",
+    slug: "prone-press-up",
+    category: "back",
+    bodyRegion: "back",
+    difficulty: "beginner",
+    duration: 3,
+    reps: "10 reps",
+    sets: 3,
+    equipment: "Yoga mat (optional)",
+    purpose: "Relieves lower back stiffness",
+    description: "Promotes lumbar extension to centralize discogenic pain — a cornerstone of the McKenzie method.",
+    steps: [
+      "Lie face down on the floor",
+      "Place hands under your shoulders",
+      "Press your upper body up slowly",
+      "Keep hips on the floor",
+      "Hold briefly, then lower down"
     ],
     targetMuscles: ["Erector spinae", "Lumbar extensors"],
     commonMistakes: ["Lifting hips off the floor", "Pushing through pain that radiates further"],
-    evidenceNote: "Core of the McKenzie method — strong evidence for disc-related LBP (McKenzie & May, 2003)."
+    cautions: ["Stop if pain moves further down the leg (peripheralizes)"],
+    evidenceNote: "Core of the McKenzie method — strong evidence for disc-related LBP.",
+    regression: "Only press up onto your elbows (sphinx pose)",
+    progression: "Hold at the top for 5 seconds",
+    illustration: "pronePress",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 8,
+    name: "Bird-Dog",
+    slug: "bird-dog",
+    category: "back",
+    bodyRegion: "back",
+    difficulty: "intermediate",
+    duration: 5,
+    reps: "10 each side",
+    sets: 3,
+    equipment: "Yoga mat (optional)",
+    purpose: "Builds core stability and balance",
+    description: "Trains core stability and spinal control through contralateral limb movement — validated by spine biomechanics research.",
+    steps: [
+      "Start on hands and knees",
+      "Brace your core gently",
+      "Extend right arm and left leg out",
+      "Hold for 5 seconds, stay level",
+      "Switch to the other side"
+    ],
+    targetMuscles: ["Multifidus", "Transverse abdominis", "Gluteus maximus"],
+    commonMistakes: ["Rotating hips when extending leg", "Losing neutral spine"],
+    cautions: ["Keep hips perfectly level throughout"],
+    evidenceNote: "Core exercise validated by McGill (2007) for low back pain rehabilitation.",
+    regression: "Only extend one limb at a time",
+    progression: "Add ankle weights or hold longer",
+    illustration: "birdDog",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 9,
+    name: "Dead Bug",
+    slug: "dead-bug",
+    category: "core",
+    bodyRegion: "core",
+    difficulty: "intermediate",
+    duration: 3,
+    reps: "8 each side",
+    sets: 3,
+    equipment: "Yoga mat",
+    purpose: "Strengthens deep core muscles",
+    description: "Builds deep core stability while maintaining a neutral lumbar spine — essential for protecting your back during daily activities.",
+    steps: [
+      "Lie on your back, arms up, knees at 90°",
+      "Press lower back into the floor",
+      "Extend right arm and left leg out",
+      "Don't let your back arch",
+      "Return and switch sides"
+    ],
+    targetMuscles: ["Transverse abdominis", "Rectus abdominis", "Diaphragm"],
+    commonMistakes: ["Lower back arching off the floor", "Moving too fast"],
+    cautions: ["If your back arches, reduce the range of motion"],
+    evidenceNote: "Recommended for motor control retraining in chronic low back pain.",
+    regression: "Only extend the legs, keep arms still",
+    progression: "Slow the movement to 5 seconds per rep",
+    illustration: "deadBug",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 10,
+    name: "Glute Bridge",
+    slug: "glute-bridge",
+    category: "hip",
+    bodyRegion: "hip",
+    difficulty: "beginner",
+    duration: 3,
+    reps: "12 reps",
+    sets: 3,
+    equipment: "Yoga mat (optional)",
+    purpose: "Activates glutes for hip support",
+    description: "Activates glutes and hamstrings while teaching hip extension control — foundational for any lower body rehab program.",
+    steps: [
+      "Lie on your back, knees bent, feet flat",
+      "Push through your heels",
+      "Lift hips toward the ceiling",
+      "Squeeze glutes at the top for 3 seconds",
+      "Lower slowly back down"
+    ],
+    targetMuscles: ["Gluteus maximus", "Hamstrings", "Core stabilizers"],
+    commonMistakes: ["Arching the lower back at the top", "Pushing through toes"],
+    cautions: ["Don't overextend — stop when hips are in line with knees and shoulders"],
+    evidenceNote: "Foundational exercise in ACL rehab and hip strengthening protocols.",
+    regression: "Reduce hold time and range of motion",
+    progression: "Single-leg glute bridge",
+    illustration: "gluteBridge",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 11,
+    name: "Clamshells",
+    slug: "clamshells",
+    category: "hip",
+    bodyRegion: "hip",
+    difficulty: "beginner",
+    duration: 2,
+    reps: "15 each side",
+    sets: 3,
+    equipment: "Resistance band (optional)",
+    purpose: "Strengthens hip stabilizers",
+    description: "Isolates the gluteus medius for hip stability and knee alignment — critical for runners and anyone with knee pain.",
+    steps: [
+      "Lie on your side, knees bent 45°",
+      "Keep your feet together",
+      "Lift your top knee up like a clamshell",
+      "Don't let your pelvis roll backward",
+      "Lower slowly and repeat"
+    ],
+    targetMuscles: ["Gluteus medius", "Gluteus minimus", "Deep hip rotators"],
+    commonMistakes: ["Rolling pelvis backward", "Using momentum"],
+    cautions: ["Keep the movement controlled — quality over speed"],
+    evidenceNote: "High gluteus medius activation confirmed by EMG studies (Distefano et al., 2009).",
+    regression: "Reduce range — don't lift as high",
+    progression: "Add a resistance band above knees",
+    illustration: "clamshell",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 12,
+    name: "Straight Leg Raise",
+    slug: "straight-leg-raise",
+    category: "knee",
+    bodyRegion: "knee",
+    difficulty: "beginner",
+    duration: 3,
+    reps: "10 each leg",
+    sets: 3,
+    equipment: "Yoga mat (optional)",
+    purpose: "Strengthens quads without bending the knee",
+    description: "Strengthens the quadriceps without bending the knee — the go-to exercise after knee surgery or injury.",
+    steps: [
+      "Lie on your back, one knee bent",
+      "Keep the other leg straight",
+      "Tighten the thigh muscle",
+      "Lift the straight leg up",
+      "Hold 3 seconds, then lower slowly"
+    ],
+    targetMuscles: ["Quadriceps (VMO)", "Hip flexors"],
+    commonMistakes: ["Bending the working knee", "Lifting too high"],
+    cautions: ["If recently post-surgery, confirm range of motion with your physio"],
+    evidenceNote: "Staple exercise in post-operative knee rehab (ACL, meniscus, TKR).",
+    regression: "Just tighten the quad without lifting",
+    progression: "Add a light ankle weight",
+    illustration: "straightLegRaise",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 13,
+    name: "Standing Calf Raises",
+    slug: "standing-calf-raises",
+    category: "knee",
+    bodyRegion: "knee",
+    difficulty: "beginner",
+    duration: 2,
+    reps: "15 reps",
+    sets: 3,
+    equipment: "Wall or chair for balance",
+    purpose: "Builds lower leg strength",
+    description: "Strengthens the gastrocnemius and soleus — essential for ankle stability and Achilles tendon health.",
+    steps: [
+      "Stand with feet hip-width apart",
+      "Hold a wall for balance",
+      "Rise up onto your toes",
+      "Hold at the top for 2 seconds",
+      "Lower slowly back down"
+    ],
+    targetMuscles: ["Gastrocnemius", "Soleus"],
+    commonMistakes: ["Rising too quickly", "Not reaching full height"],
+    cautions: ["Perform slowly — eccentric control is key"],
+    evidenceNote: "Eccentric calf raises are gold-standard for Achilles tendinopathy.",
+    regression: "Use both hands on the wall for extra support",
+    progression: "Single-leg calf raises",
+    illustration: "calfRaise",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
+  },
+  {
+    id: 14,
+    name: "Single Leg Balance",
+    slug: "single-leg-balance",
+    category: "ankle",
+    bodyRegion: "ankle",
+    difficulty: "beginner",
+    duration: 30,
+    reps: "3 each leg",
+    sets: 2,
+    equipment: "Wall or chair nearby",
+    purpose: "Improves balance and prevents re-injury",
+    description: "Trains proprioception and balance — research shows it reduces ankle sprain recurrence by 50%.",
+    steps: [
+      "Stand near a wall for safety",
+      "Lift one foot off the ground",
+      "Keep standing knee slightly bent",
+      "Focus on a fixed point ahead",
+      "Hold for 30 seconds"
+    ],
+    targetMuscles: ["Ankle stabilizers", "Hip abductors", "Core"],
+    commonMistakes: ["Locking the standing knee", "Looking at the floor"],
+    cautions: ["Stay near a support surface until confident"],
+    evidenceNote: "Proprioceptive training reduces ankle sprain recurrence by 50% (Verhagen et al., 2004).",
+    regression: "Keep fingertips on the wall",
+    progression: "Close your eyes or stand on a pillow",
+    illustration: "singleLegBalance",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
   },
   {
     id: 15,
-    name: "Single Leg Balance",
+    name: "Ankle Alphabet",
+    slug: "ankle-alphabet",
     category: "ankle",
+    bodyRegion: "ankle",
     difficulty: "beginner",
-    duration: "30s hold",
-    reps: "3 reps each leg",
-    description: "Trains proprioception and balance for injury prevention.",
-    instructions: [
-      "Stand on one leg near a wall or chair for safety",
-      "Keep your standing knee slightly bent",
-      "Focus on a fixed point ahead of you",
-      "Hold for 30 seconds without touching down",
-      "Progress: close your eyes or stand on an unstable surface"
+    duration: 120,
+    reps: "A-Z each foot",
+    sets: 1,
+    equipment: "Chair",
+    purpose: "Restores full ankle range of motion",
+    description: "Improves ankle range of motion in all planes — the classic early-stage ankle rehab exercise.",
+    steps: [
+      "Sit with your leg extended",
+      "Point your big toe forward",
+      "Trace each letter of the alphabet",
+      "Move only your ankle, not your leg",
+      "Go slowly through A to Z"
     ],
-    targetMuscles: ["Ankle stabilizers", "Hip abductors", "Core"],
-    commonMistakes: ["Locking the standing knee", "Looking down at the floor"],
-    evidenceNote: "Proprioceptive training reduces ankle sprain recurrence by 50% (Verhagen et al., 2004)."
+    targetMuscles: ["Tibialis anterior", "Peroneals", "Ankle joint capsule"],
+    commonMistakes: ["Moving the whole leg", "Rushing through letters"],
+    cautions: ["Stop if you feel sharp pain — mild discomfort is normal"],
+    evidenceNote: "Common early-stage exercise in ankle sprain rehabilitation protocols.",
+    regression: "Just trace A through M if fatigued",
+    progression: "Do it standing on one leg for added challenge",
+    illustration: "ankleAlphabet",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
   },
   {
     id: 16,
-    name: "Quadruped Thread the Needle",
+    name: "Thread the Needle",
+    slug: "thread-the-needle",
     category: "back",
+    bodyRegion: "back",
     difficulty: "beginner",
-    duration: "3s hold",
-    reps: "10 reps each side x 2 sets",
-    description: "Improves thoracic spine rotation and reduces mid-back stiffness.",
-    instructions: [
-      "Start on hands and knees in a tabletop position",
-      "Reach your right arm under your body toward the left side",
-      "Let your right shoulder and temple rest on the floor",
-      "Hold the stretch, then reverse and reach your right arm up to the ceiling",
-      "Follow your hand with your eyes to maximize rotation"
+    duration: 3,
+    reps: "10 each side",
+    sets: 2,
+    equipment: "Yoga mat (optional)",
+    purpose: "Unlocks mid-back rotation",
+    description: "Improves thoracic spine rotation — essential for reducing mid-back stiffness from prolonged sitting.",
+    steps: [
+      "Start on hands and knees",
+      "Reach right arm under your body to the left",
+      "Let your shoulder rest on the floor",
+      "Hold the stretch briefly",
+      "Reverse and reach arm to the ceiling"
     ],
     targetMuscles: ["Thoracic rotators", "Obliques", "Rhomboids"],
-    commonMistakes: ["Shifting weight to one side instead of rotating", "Moving too quickly"],
-    evidenceNote: "Effective for thoracic mobility deficits common in desk workers and overhead athletes."
+    commonMistakes: ["Shifting weight instead of rotating", "Moving too quickly"],
+    cautions: ["Keep hips stable — only the upper body rotates"],
+    evidenceNote: "Effective for thoracic mobility deficits common in desk workers.",
+    regression: "Skip the overhead reach — just do the thread",
+    progression: "Hold for 5 seconds in each position",
+    illustration: "threadNeedle",
+    media: { type: "illustration", primaryUrl: null, thumbnailUrl: null, alternateAngleUrl: null, attribution: null, source: null, license: null },
   }
 ];
 
-export const categories = [
-  { id: "all", label: "All", icon: "grid" },
-  { id: "neck", label: "Neck", icon: "neck" },
-  { id: "shoulder", label: "Shoulder", icon: "shoulder" },
-  { id: "back", label: "Back", icon: "back" },
-  { id: "core", label: "Core", icon: "core" },
-  { id: "hip", label: "Hip", icon: "hip" },
-  { id: "knee", label: "Knee", icon: "knee" },
-  { id: "ankle", label: "Ankle", icon: "ankle" }
+export const injuryAreas = [
+  { id: "neck", label: "Neck & Head", icon: "neck", description: "Headaches, stiffness, forward head posture" },
+  { id: "shoulder", label: "Shoulder", icon: "shoulder", description: "Frozen shoulder, rotator cuff, posture" },
+  { id: "back", label: "Back", icon: "back", description: "Lower back pain, sciatica, disc issues" },
+  { id: "core", label: "Core", icon: "core", description: "Weak core, post-surgery stability" },
+  { id: "hip", label: "Hip", icon: "hip", description: "Hip pain, bursitis, weak glutes" },
+  { id: "knee", label: "Knee", icon: "knee", description: "ACL recovery, arthritis, patellar pain" },
+  { id: "ankle", label: "Ankle & Foot", icon: "ankle", description: "Sprains, plantar fasciitis, instability" }
 ];
 
-export const difficultyColors = {
-  beginner: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-  intermediate: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-  advanced: "text-red-400 bg-red-400/10 border-red-400/20"
+export const bodyRegionColors = {
+  neck: { bg: 'bg-violet-50', text: 'text-violet-700', border: 'border-violet-200', accent: '#7C3AED' },
+  shoulder: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', accent: '#2563EB' },
+  back: { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200', accent: '#0D9488' },
+  core: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200', accent: '#D97706' },
+  hip: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200', accent: '#E11D48' },
+  knee: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', accent: '#059669' },
+  ankle: { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200', accent: '#0891B2' },
 };
+
+export const difficultyConfig = {
+  beginner: { label: 'Beginner', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
+  intermediate: { label: 'Intermediate', color: 'text-amber-700 bg-amber-50 border-amber-200' },
+  advanced: { label: 'Advanced', color: 'text-red-700 bg-red-50 border-red-200' },
+};
+
+export const plans = {
+  neck: {
+    name: "Neck Recovery",
+    weeks: [
+      { week: 1, name: "Gentle Mobilization", exerciseIds: [1, 2], difficulty: "beginner" },
+      { week: 2, name: "Building Stability", exerciseIds: [1, 2, 3], difficulty: "beginner" },
+      { week: 3, name: "Strengthening", exerciseIds: [1, 2, 3, 6], difficulty: "beginner" },
+      { week: 4, name: "Full Integration", exerciseIds: [1, 2, 3, 6, 16], difficulty: "intermediate" }
+    ]
+  },
+  shoulder: {
+    name: "Shoulder Rehab",
+    weeks: [
+      { week: 1, name: "Pain Relief", exerciseIds: [3, 4], difficulty: "beginner" },
+      { week: 2, name: "Mobility Focus", exerciseIds: [3, 4, 5], difficulty: "beginner" },
+      { week: 3, name: "Stability Training", exerciseIds: [3, 4, 5, 6], difficulty: "intermediate" },
+      { week: 4, name: "Strength Building", exerciseIds: [3, 4, 5, 6, 8], difficulty: "intermediate" }
+    ]
+  },
+  back: {
+    name: "Back Pain Program",
+    weeks: [
+      { week: 1, name: "Gentle Movement", exerciseIds: [6, 7], difficulty: "beginner" },
+      { week: 2, name: "Core Activation", exerciseIds: [6, 7, 16], difficulty: "beginner" },
+      { week: 3, name: "Stability Phase", exerciseIds: [6, 7, 8, 16], difficulty: "intermediate" },
+      { week: 4, name: "Full Recovery", exerciseIds: [6, 7, 8, 9, 16], difficulty: "intermediate" }
+    ]
+  },
+  core: {
+    name: "Core Strengthening",
+    weeks: [
+      { week: 1, name: "Foundation", exerciseIds: [6, 10], difficulty: "beginner" },
+      { week: 2, name: "Activation", exerciseIds: [6, 9, 10], difficulty: "beginner" },
+      { week: 3, name: "Building Power", exerciseIds: [6, 8, 9, 10], difficulty: "intermediate" },
+      { week: 4, name: "Full Core Circuit", exerciseIds: [6, 8, 9, 10, 7], difficulty: "intermediate" }
+    ]
+  },
+  hip: {
+    name: "Hip Recovery",
+    weeks: [
+      { week: 1, name: "Gentle Activation", exerciseIds: [10, 11], difficulty: "beginner" },
+      { week: 2, name: "Mobility Work", exerciseIds: [10, 11, 6], difficulty: "beginner" },
+      { week: 3, name: "Strengthening", exerciseIds: [10, 11, 6, 12], difficulty: "intermediate" },
+      { week: 4, name: "Functional Recovery", exerciseIds: [10, 11, 6, 12, 8], difficulty: "intermediate" }
+    ]
+  },
+  knee: {
+    name: "Knee Rehab",
+    weeks: [
+      { week: 1, name: "Quad Activation", exerciseIds: [12, 13], difficulty: "beginner" },
+      { week: 2, name: "Range of Motion", exerciseIds: [12, 13, 10], difficulty: "beginner" },
+      { week: 3, name: "Stability Focus", exerciseIds: [12, 13, 10, 11], difficulty: "intermediate" },
+      { week: 4, name: "Return to Function", exerciseIds: [12, 13, 10, 11, 14], difficulty: "intermediate" }
+    ]
+  },
+  ankle: {
+    name: "Ankle Recovery",
+    weeks: [
+      { week: 1, name: "Range of Motion", exerciseIds: [15, 14], difficulty: "beginner" },
+      { week: 2, name: "Balance Training", exerciseIds: [15, 14, 13], difficulty: "beginner" },
+      { week: 3, name: "Strength Phase", exerciseIds: [15, 14, 13, 10], difficulty: "intermediate" },
+      { week: 4, name: "Full Recovery", exerciseIds: [15, 14, 13, 10, 11], difficulty: "intermediate" }
+    ]
+  }
+};
+
+export function getExerciseById(id) {
+  return exercises.find(e => e.id === id);
+}
+
+export function getPlanExercises(injuryArea, week) {
+  const plan = plans[injuryArea];
+  if (!plan) return [];
+  const weekPlan = plan.weeks.find(w => w.week === week) || plan.weeks[0];
+  return weekPlan.exerciseIds.map(id => getExerciseById(id)).filter(Boolean);
+}
+
+export function getWeekPlan(injuryArea, week) {
+  const plan = plans[injuryArea];
+  if (!plan) return null;
+  return plan.weeks.find(w => w.week === week) || plan.weeks[0];
+}
 
 export default exercises;

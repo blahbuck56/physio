@@ -1,8 +1,32 @@
-/* Hide scrollbar for category filter */
+/* Hide scrollbar for horizontal scroll containers */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Focus visible outline */
+*:focus-visible {
+  outline: 2px solid var(--color-mint);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for layout changes */
+.transition-layout {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover elevation */
+@media (hover: hover) {
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Smooth card transitions */
+button {
+  -webkit-tap-highlight-color: transparent;
 }
