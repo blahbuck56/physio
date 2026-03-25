@@ -12,7 +12,7 @@ export default function AppShell({ state, dispatch, children }) {
   const { isDesktop } = useBreakpoint();
 
   // Full-screen screens bypass the shell
-  const fullScreens = ['onboarding', 'player', 'feedback'];
+  const fullScreens = ['onboarding', 'player', 'feedback', 'summary'];
   if (fullScreens.includes(state.screen)) {
     return <>{children}</>;
   }

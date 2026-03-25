@@ -4,6 +4,7 @@ import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
 import ExercisePlayer from './components/ExercisePlayer';
 import ExerciseFeedback from './components/ExerciseFeedback';
+import SessionSummary from './components/SessionSummary';
 import ProgressTracker from './components/ProgressTracker';
 import './App.css';
 
@@ -20,6 +21,8 @@ function App() {
         return <ExercisePlayer state={state} dispatch={dispatch} />;
       case 'feedback':
         return <ExerciseFeedback state={state} dispatch={dispatch} />;
+      case 'summary':
+        return <SessionSummary state={state} dispatch={dispatch} />;
       case 'progress':
         return <ProgressTracker state={state} dispatch={dispatch} />;
       default:

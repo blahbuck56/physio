@@ -2,6 +2,13 @@ import { plans, getPlanExercises, getWeekPlan } from '../data/exercises';
 import ExerciseCard from './ExerciseCard';
 import useBreakpoint from '../hooks/useBreakpoint';
 
+/*
+ * Dashboard — session-first entry point.
+ *
+ * Primary CTA: "Start Today's Session" — big, prominent, always visible.
+ * Secondary: week progress, stats, exercise preview list.
+ * Session resume: if todayCompleted, show "Do Another Session" variant.
+ */
 export default function Dashboard({ state, dispatch }) {
   const { profile, currentWeek, streak, completedSessions, painLog, todayCompleted } = state;
   const { isDesktop, isTablet } = useBreakpoint();
@@ -15,58 +22,43 @@ export default function Dashboard({ state, dispatch }) {
   const firstPain = painLog.length > 0 ? painLog[0].level : profile.painLevel;
   const painTrend = lastPain < firstPain ? 'improving' : lastPain === firstPain ? 'stable' : 'monitor';
   const progressPercent = Math.min(100, (weekSessions.length / 3) * 100);
+  const estimatedMins = Math.round(todayExercises.reduce((t, e) => t + (e.duration * e.sets), 0) / 60);
 
-  return (
-    <div className="min-h-screen bg-[var(--color-bg)]">
-      <div className={`px-4 py-6 md:px-8 md:py-8 ${isDesktop ? 'max-w-6xl' : 'max-w-lg mx-auto'}`}>
+  const startSession = () => dispatch({ type: 'START_SESSION' });
 
-        {/* Desktop: multi-zone layout */}
-        {isDesktop ? (
+  // ─── DESKTOP ──────────────────────────────────
+  if (isDesktop) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg)]">
+        <div className="px-8 py-8 max-w-6xl">
           <div className="grid grid-cols-3 gap-6">
-            {/* Main content — 2/3 */}
+            {/* Main — 2/3 */}
             <div className="col-span-2 space-y-6">
-              {/* Hero CTA */}
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl border border-emerald-100 p-8">
-                <div className="flex items-center gap-2 text-sm text-[var(--color-mint)] font-medium mb-2">
-                  <span className="w-2 h-2 rounded-full bg-[var(--color-mint)] animate-pulse-ring" />
-                  {todayCompleted ? 'Session completed' : 'Ready for today\'s session'}
-                </div>
-                <h2 className="text-2xl font-display font-bold text-[var(--color-text)] mb-1">
-                  Week {currentWeek}: {weekPlan?.name}
-                </h2>
-                <p className="text-[var(--color-text-secondary)] mb-6">
-                  {todayExercises.length} exercises — {todayExercises.reduce((t, e) => t + (e.duration * e.sets), 0) / 60 | 0} min estimated
-                </p>
-                <button
-                  onClick={() => dispatch({ type: 'START_SESSION' })}
-                  className="px-8 py-4 rounded-2xl text-base font-bold bg-[var(--color-mint)] text-white shadow-lg shadow-[var(--color-mint)]/20 transition-all hover:shadow-xl hover:shadow-[var(--color-mint)]/30 active:scale-[0.98]"
-                >
-                  {todayCompleted ? 'Do Another Session' : 'Start Today\'s Session'}
-                </button>
-              </div>
+              {/* Session CTA hero */}
+              <SessionHero
+                todayCompleted={todayCompleted}
+                currentWeek={currentWeek}
+                weekName={weekPlan?.name}
+                exerciseCount={todayExercises.length}
+                estimatedMins={estimatedMins}
+                onStart={startSession}
+              />
 
-              {/* Exercise grid */}
+              {/* Exercise preview */}
               <div>
                 <h3 className="text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">
                   Today's Exercises
                 </h3>
                 <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
                   {todayExercises.map((ex, i) => (
-                    <ExerciseCard
-                      key={ex.id}
-                      exercise={ex}
-                      index={i}
-                      onClick={() => {}}
-                      variant="default"
-                    />
+                    <ExerciseCard key={ex.id} exercise={ex} index={i} variant="default" />
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Sidebar stats — 1/3 */}
+            {/* Sidebar — 1/3 */}
             <div className="space-y-4">
-              {/* Stats cards */}
               <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
                 <h3 className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-4">Quick Stats</h3>
                 <div className="space-y-4">
@@ -81,7 +73,6 @@ export default function Dashboard({ state, dispatch }) {
                 </div>
               </div>
 
-              {/* Week progress */}
               <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
                 <h3 className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Week Progress</h3>
                 <div className="flex items-center justify-between mb-2">
@@ -96,7 +87,6 @@ export default function Dashboard({ state, dispatch }) {
                 )}
               </div>
 
-              {/* Plan overview */}
               <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
                 <h3 className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Recovery Plan</h3>
                 <div className="space-y-2.5">
@@ -126,83 +116,114 @@ export default function Dashboard({ state, dispatch }) {
               </p>
             </div>
           </div>
-        ) : (
-          /* Mobile + Tablet layout */
-          <div className="space-y-5">
-            {/* Stats row */}
-            <div className={`grid gap-3 ${isTablet ? 'grid-cols-4' : 'grid-cols-3'}`}>
-              <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
-                <div className="text-2xl font-bold text-[var(--color-mint)]">{streak}</div>
-                <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Streak</div>
-              </div>
-              <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
-                <div className="text-2xl font-bold text-[var(--color-text)]">{totalSessions}</div>
-                <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Sessions</div>
-              </div>
-              <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
-                <div className={`text-2xl font-bold ${painTrend === 'improving' ? 'text-[var(--color-mint)]' : painTrend === 'stable' ? 'text-[var(--color-amber)]' : 'text-[var(--color-danger)]'}`}>
-                  {lastPain}/10
-                </div>
-                <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Pain {painTrend === 'improving' ? '↓' : painTrend === 'stable' ? '→' : '↑'}</div>
-              </div>
-              {isTablet && (
-                <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
-                  <div className="text-2xl font-bold text-[var(--color-mint)]">{Math.round(progressPercent)}%</div>
-                  <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Week {currentWeek}</div>
-                </div>
-              )}
-            </div>
-
-            {/* Week progress */}
-            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h2 className="font-bold text-[var(--color-text)]">Week {currentWeek}: {weekPlan?.name}</h2>
-                  <p className="text-sm text-[var(--color-text-secondary)]">{weekSessions.length}/3 sessions this week</p>
-                </div>
-                <div className="text-sm font-bold text-[var(--color-mint)]">{Math.round(progressPercent)}%</div>
-              </div>
-              <div className="w-full h-2.5 bg-[var(--color-surface)] rounded-full overflow-hidden">
-                <div className="h-full bg-[var(--color-mint)] rounded-full transition-all duration-700" style={{ width: `${progressPercent}%` }} />
-              </div>
-            </div>
-
-            {/* Exercise list */}
-            <div>
-              <h3 className="text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Today's Session</h3>
-              {isTablet ? (
-                <div className="grid grid-cols-2 gap-3">
-                  {todayExercises.map((ex, i) => (
-                    <ExerciseCard key={ex.id} exercise={ex} index={i} variant="default" />
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {todayExercises.map((ex, i) => (
-                    <ExerciseCard key={ex.id} exercise={ex} index={i} variant="list" />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* CTA */}
-            <button
-              onClick={() => dispatch({ type: 'START_SESSION' })}
-              className="w-full py-5 rounded-2xl text-lg font-bold bg-[var(--color-mint)] text-white shadow-lg shadow-[var(--color-mint)]/20 transition-all active:scale-[0.98] sticky bottom-4"
-            >
-              {todayCompleted ? 'Do Another Session' : 'Start Today\'s Session'}
-            </button>
-
-            {todayCompleted && (
-              <p className="text-center text-sm text-[var(--color-mint)] font-medium">Session completed today!</p>
-            )}
-
-            <p className="text-xs text-[var(--color-text-muted)] text-center mt-4 leading-relaxed pb-4">
-              Not a substitute for professional medical advice.
-            </p>
-          </div>
-        )}
+        </div>
       </div>
+    );
+  }
+
+  // ─── MOBILE + TABLET ──────────────────────────
+  return (
+    <div className="min-h-screen bg-[var(--color-bg)]">
+      <div className="px-4 py-6 md:px-8 md:py-8 max-w-lg mx-auto">
+        <div className="space-y-5">
+          {/* Session CTA — prominent top placement */}
+          <SessionHero
+            todayCompleted={todayCompleted}
+            currentWeek={currentWeek}
+            weekName={weekPlan?.name}
+            exerciseCount={todayExercises.length}
+            estimatedMins={estimatedMins}
+            onStart={startSession}
+          />
+
+          {/* Stats row */}
+          <div className={`grid gap-3 ${isTablet ? 'grid-cols-4' : 'grid-cols-3'}`}>
+            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
+              <div className="text-2xl font-bold text-[var(--color-mint)]">{streak}</div>
+              <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Streak</div>
+            </div>
+            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
+              <div className="text-2xl font-bold text-[var(--color-text)]">{totalSessions}</div>
+              <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Sessions</div>
+            </div>
+            <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
+              <div className={`text-2xl font-bold ${painTrend === 'improving' ? 'text-[var(--color-mint)]' : painTrend === 'stable' ? 'text-[var(--color-amber)]' : 'text-[var(--color-danger)]'}`}>
+                {lastPain}/10
+              </div>
+              <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Pain {painTrend === 'improving' ? '↓' : painTrend === 'stable' ? '→' : '↑'}</div>
+            </div>
+            {isTablet && (
+              <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 text-center">
+                <div className="text-2xl font-bold text-[var(--color-mint)]">{Math.round(progressPercent)}%</div>
+                <div className="text-xs text-[var(--color-text-muted)] mt-0.5">Week {currentWeek}</div>
+              </div>
+            )}
+          </div>
+
+          {/* Week progress */}
+          <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h2 className="font-bold text-[var(--color-text)]">Week {currentWeek}: {weekPlan?.name}</h2>
+                <p className="text-sm text-[var(--color-text-secondary)]">{weekSessions.length}/3 sessions this week</p>
+              </div>
+              <div className="text-sm font-bold text-[var(--color-mint)]">{Math.round(progressPercent)}%</div>
+            </div>
+            <div className="w-full h-2.5 bg-[var(--color-surface)] rounded-full overflow-hidden">
+              <div className="h-full bg-[var(--color-mint)] rounded-full transition-all duration-700" style={{ width: `${progressPercent}%` }} />
+            </div>
+          </div>
+
+          {/* Exercise list */}
+          <div>
+            <h3 className="text-sm font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">Today's Exercises</h3>
+            {isTablet ? (
+              <div className="grid grid-cols-2 gap-3">
+                {todayExercises.map((ex, i) => (
+                  <ExerciseCard key={ex.id} exercise={ex} index={i} variant="default" />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {todayExercises.map((ex, i) => (
+                  <ExerciseCard key={ex.id} exercise={ex} index={i} variant="list" />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <p className="text-xs text-[var(--color-text-muted)] text-center mt-4 leading-relaxed pb-4">
+            Not a substitute for professional medical advice.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Session Hero CTA ─────────────────────── */
+function SessionHero({ todayCompleted, currentWeek, weekName, exerciseCount, estimatedMins, onStart }) {
+  return (
+    <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl border border-emerald-100 p-6 md:p-8">
+      <div className="flex items-center gap-2 text-sm text-[var(--color-mint)] font-medium mb-2">
+        <span className="w-2 h-2 rounded-full bg-[var(--color-mint)] animate-pulse-ring" />
+        {todayCompleted ? 'Session completed today' : 'Ready for today\'s session'}
+      </div>
+      <h2 className="text-2xl font-display font-bold text-[var(--color-text)] mb-1">
+        Week {currentWeek}: {weekName}
+      </h2>
+      <p className="text-[var(--color-text-secondary)] mb-5">
+        {exerciseCount} exercises &middot; ~{estimatedMins} min
+      </p>
+      <button
+        onClick={onStart}
+        className="w-full md:w-auto px-8 py-4 rounded-2xl text-base font-bold bg-[var(--color-mint)] text-white shadow-lg shadow-[var(--color-mint)]/20 transition-all hover:shadow-xl hover:shadow-[var(--color-mint)]/30 active:scale-[0.98]"
+      >
+        {todayCompleted ? 'Do Another Session' : 'Start Today\'s Session'}
+      </button>
+      {todayCompleted && (
+        <p className="text-sm text-[var(--color-mint)] font-medium mt-3">Great work today!</p>
+      )}
     </div>
   );
 }

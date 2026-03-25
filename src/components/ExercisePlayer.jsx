@@ -1,15 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getPlanExercises, bodyRegionColors, difficultyConfig } from '../data/exercises';
 import ExerciseIllustration from './media/ExerciseIllustration';
 import useBreakpoint from '../hooks/useBreakpoint';
 
 /*
- * ExercisePlayer — two-phase visual-first guided experience.
+ * ExercisePlayer — linear guided session flow.
  *
- * Phase 1: "Watch Demo" — media hero + read instructions + "Start Set" CTA
- * Phase 2: "Perform" — media reference + timer/reps + controls + "Done" CTA
+ * Flow: Preview → Guided Execution → Feedback (via ExerciseFeedback screen)
  *
- * Desktop: split-panel (media left, instructions/controls right)
+ * Preview: exercise name, purpose, visual, "Begin" CTA
+ * Execution: large visual, progressive step reveal, embedded contextual timing
+ *   (e.g. "Hold for 5 seconds" with inline countdown — NOT a standalone timer)
+ *
+ * Desktop: split-panel (media left, guidance right)
  * Mobile: single-column, media on top
  */
 export default function ExercisePlayer({ state, dispatch }) {
@@ -19,51 +22,75 @@ export default function ExercisePlayer({ state, dispatch }) {
   const exercise = exercises[session.exerciseIndex];
   const isLast = session.exerciseIndex === exercises.length - 1;
 
-  const [phase, setPhase] = useState('demo'); // 'demo' | 'perform'
+  const [phase, setPhase] = useState('preview'); // 'preview' | 'execute'
+  const [currentStep, setCurrentStep] = useState(0);
   const [setCount, setSetCount] = useState(1);
-  const [timerActive, setTimerActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [holdTime, setHoldTime] = useState(0);
+  const [holdActive, setHoldActive] = useState(false);
   const [showPain, setShowPain] = useState(false);
-  const intervalRef = useRef(null);
+  const holdRef = useRef(null);
 
   const region = bodyRegionColors[exercise.bodyRegion] || bodyRegionColors.back;
   const difficulty = difficultyConfig[exercise.difficulty];
 
   // Reset on exercise change
   useEffect(() => {
-    setPhase('demo');
+    setPhase('preview');
+    setCurrentStep(0);
     setSetCount(1);
-    setTimerActive(false);
-    setTimeLeft(exercise.duration);
+    setHoldTime(0);
+    setHoldActive(false);
     setShowPain(false);
   }, [exercise.id]);
 
-  // Timer
+  // Mark exercise start time when entering execution
   useEffect(() => {
-    if (timerActive && timeLeft > 0) {
-      intervalRef.current = setInterval(() => setTimeLeft(t => t - 1), 1000);
-    } else if (timeLeft === 0 && timerActive) {
-      setTimerActive(false);
-      if (setCount < exercise.sets) {
-        setTimeout(() => {
-          setSetCount(s => s + 1);
-          setTimeLeft(exercise.duration);
-        }, 800);
-      }
+    if (phase === 'execute') {
+      dispatch({ type: 'START_EXERCISE' });
     }
-    return () => clearInterval(intervalRef.current);
-  }, [timerActive, timeLeft]);
+  }, [phase]);
 
-  const startPerform = () => {
-    setPhase('perform');
-    setTimeLeft(exercise.duration);
+  // Contextual hold timer — counts UP to the target duration
+  useEffect(() => {
+    if (holdActive) {
+      holdRef.current = setInterval(() => {
+        setHoldTime(t => {
+          const next = t + 1;
+          if (next >= exercise.duration) {
+            setHoldActive(false);
+            // Auto-advance set
+            if (setCount < exercise.sets) {
+              setTimeout(() => {
+                setSetCount(s => s + 1);
+                setHoldTime(0);
+              }, 600);
+            }
+            return exercise.duration;
+          }
+          return next;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(holdRef.current);
+  }, [holdActive, exercise.duration, setCount, exercise.sets]);
+
+  const beginExercise = () => {
+    setPhase('execute');
+    setCurrentStep(0);
+    setHoldTime(0);
   };
 
   const handleComplete = (feedback) => {
     dispatch({ type: 'COMPLETE_EXERCISE', exerciseId: exercise.id, feedback });
   };
 
-  // Pain report overlay
+  const advanceStep = useCallback(() => {
+    if (currentStep < exercise.steps.length - 1) {
+      setCurrentStep(s => s + 1);
+    }
+  }, [currentStep, exercise.steps.length]);
+
+  // Pain overlay
   if (showPain) {
     return (
       <PainReport
@@ -74,111 +101,27 @@ export default function ExercisePlayer({ state, dispatch }) {
     );
   }
 
-  const progress = exercise.duration > 0 ? ((exercise.duration - timeLeft) / exercise.duration) * 100 : 0;
-  const mins = Math.floor(timeLeft / 60);
-  const secs = timeLeft % 60;
+  const holdProgress = exercise.duration > 0 ? (holdTime / exercise.duration) * 100 : 0;
+  const remainingHold = Math.max(0, exercise.duration - holdTime);
 
-  // Desktop split layout
-  if (isDesktop) {
-    return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex">
-        {/* Left panel — media */}
-        <div className="w-1/2 xl:w-[55%] bg-white border-r border-[var(--color-border)] flex flex-col sticky top-0 h-screen">
-          <TopBar session={session} exercises={exercises} dispatch={dispatch} />
-          <ProgressDots exercises={exercises} currentIndex={session.exerciseIndex} />
-          <div className="flex-1 flex items-center justify-center p-8">
-            <ExerciseIllustration exercise={exercise} size="lg" className="w-full max-w-xl" />
-          </div>
-          <div className="px-8 pb-6">
-            <div className="flex flex-wrap gap-1.5">
-              {exercise.targetMuscles.map((m, i) => (
-                <span key={i} className={`text-xs px-2.5 py-1 rounded-full ${region.bg} ${region.text} border ${region.border}`}>
-                  {m}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
+  // Shared content panels
+  const mediaPanel = (size = 'lg') => (
+    <ExerciseIllustration exercise={exercise} size={size} className="w-full" />
+  );
 
-        {/* Right panel — instructions / controls */}
-        <div className="w-1/2 xl:w-[45%] overflow-y-auto">
-          <div className="max-w-lg mx-auto p-8">
-            <ExerciseHeader exercise={exercise} region={region} difficulty={difficulty} />
-
-            {phase === 'demo' ? (
-              <DemoContent exercise={exercise} region={region} onStart={startPerform} />
-            ) : (
-              <PerformContent
-                exercise={exercise}
-                setCount={setCount}
-                timerActive={timerActive}
-                timeLeft={timeLeft}
-                mins={mins}
-                secs={secs}
-                progress={progress}
-                onToggleTimer={() => {
-                  if (timeLeft === 0) setTimeLeft(exercise.duration);
-                  setTimerActive(!timerActive);
-                }}
-                onPain={() => setShowPain(true)}
-                onComplete={() => handleComplete('normal')}
-                isLast={isLast}
-              />
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Mobile / tablet layout
-  return (
-    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
-      <TopBar session={session} exercises={exercises} dispatch={dispatch} />
-      <ProgressDots exercises={exercises} currentIndex={session.exerciseIndex} />
-
-      {/* Media area */}
-      <div className={`px-4 ${phase === 'demo' ? 'mb-4' : 'mb-2'}`}>
-        <ExerciseIllustration
-          exercise={exercise}
-          size={phase === 'demo' ? 'lg' : 'md'}
-          className="w-full"
-        />
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 px-4 pb-6">
-        <ExerciseHeader exercise={exercise} region={region} difficulty={difficulty} />
-
-        {phase === 'demo' ? (
-          <DemoContent exercise={exercise} region={region} onStart={startPerform} />
-        ) : (
-          <PerformContent
-            exercise={exercise}
-            setCount={setCount}
-            timerActive={timerActive}
-            timeLeft={timeLeft}
-            mins={mins}
-            secs={secs}
-            progress={progress}
-            onToggleTimer={() => {
-              if (timeLeft === 0) setTimeLeft(exercise.duration);
-              setTimerActive(!timerActive);
-            }}
-            onPain={() => setShowPain(true)}
-            onComplete={() => handleComplete('normal')}
-            isLast={isLast}
-          />
-        )}
-      </div>
+  const progressBar = (
+    <div className="flex gap-1.5 px-5 pb-3">
+      {exercises.map((_, i) => (
+        <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+          i < session.exerciseIndex ? 'bg-[var(--color-mint)]' :
+          i === session.exerciseIndex ? 'bg-[var(--color-mint)]' :
+          'bg-[var(--color-border)]'
+        }`} />
+      ))}
     </div>
   );
-}
 
-/* ---- Sub-components ---- */
-
-function TopBar({ session, exercises, dispatch }) {
-  return (
+  const topBar = (
     <div className="flex items-center justify-between px-5 pt-4 pb-2">
       <button
         onClick={() => dispatch({ type: 'SET_SCREEN', screen: 'dashboard' })}
@@ -194,21 +137,101 @@ function TopBar({ session, exercises, dispatch }) {
       </span>
     </div>
   );
-}
 
-function ProgressDots({ exercises, currentIndex }) {
+  // ─── DESKTOP SPLIT LAYOUT ─────────────────────────
+  if (isDesktop) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg)] flex">
+        {/* Left — media */}
+        <div className="w-1/2 xl:w-[55%] bg-white border-r border-[var(--color-border)] flex flex-col sticky top-0 h-screen">
+          {topBar}
+          {progressBar}
+          <div className="flex-1 flex items-center justify-center p-8">
+            {mediaPanel('lg')}
+          </div>
+          <div className="px-8 pb-6">
+            <div className="flex flex-wrap gap-1.5">
+              {exercise.targetMuscles.map((m, i) => (
+                <span key={i} className={`text-xs px-2.5 py-1 rounded-full ${region.bg} ${region.text} border ${region.border}`}>
+                  {m}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right — guidance */}
+        <div className="w-1/2 xl:w-[45%] overflow-y-auto">
+          <div className="max-w-lg mx-auto p-8">
+            <ExerciseHeader exercise={exercise} region={region} difficulty={difficulty} />
+            {phase === 'preview' ? (
+              <PreviewContent exercise={exercise} region={region} onBegin={beginExercise} />
+            ) : (
+              <ExecutionContent
+                exercise={exercise}
+                region={region}
+                currentStep={currentStep}
+                advanceStep={advanceStep}
+                setCount={setCount}
+                holdTime={holdTime}
+                holdActive={holdActive}
+                holdProgress={holdProgress}
+                remainingHold={remainingHold}
+                onToggleHold={() => {
+                  if (holdTime >= exercise.duration) setHoldTime(0);
+                  setHoldActive(!holdActive);
+                }}
+                onPain={() => setShowPain(true)}
+                onComplete={() => handleComplete('normal')}
+                isLast={isLast}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── MOBILE / TABLET ──────────────────────────────
   return (
-    <div className="flex gap-1.5 px-5 pb-3">
-      {exercises.map((_, i) => (
-        <div key={i} className={`h-1 flex-1 rounded-full transition-all duration-500 ${
-          i < currentIndex ? 'bg-[var(--color-mint)]' :
-          i === currentIndex ? 'bg-[var(--color-mint)]' :
-          'bg-[var(--color-border)]'
-        }`} />
-      ))}
+    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col">
+      {topBar}
+      {progressBar}
+
+      <div className={`px-4 ${phase === 'preview' ? 'mb-4' : 'mb-2'}`}>
+        {mediaPanel(phase === 'preview' ? 'lg' : 'md')}
+      </div>
+
+      <div className="flex-1 px-4 pb-6">
+        <ExerciseHeader exercise={exercise} region={region} difficulty={difficulty} />
+        {phase === 'preview' ? (
+          <PreviewContent exercise={exercise} region={region} onBegin={beginExercise} />
+        ) : (
+          <ExecutionContent
+            exercise={exercise}
+            region={region}
+            currentStep={currentStep}
+            advanceStep={advanceStep}
+            setCount={setCount}
+            holdTime={holdTime}
+            holdActive={holdActive}
+            holdProgress={holdProgress}
+            remainingHold={remainingHold}
+            onToggleHold={() => {
+              if (holdTime >= exercise.duration) setHoldTime(0);
+              setHoldActive(!holdActive);
+            }}
+            onPain={() => setShowPain(true)}
+            onComplete={() => handleComplete('normal')}
+            isLast={isLast}
+          />
+        )}
+      </div>
     </div>
   );
 }
+
+/* ── Sub-components ────────────────────────────── */
 
 function ExerciseHeader({ exercise, region, difficulty }) {
   return (
@@ -232,10 +255,10 @@ function ExerciseHeader({ exercise, region, difficulty }) {
   );
 }
 
-function DemoContent({ exercise, region, onStart }) {
+function PreviewContent({ exercise, region, onBegin }) {
   return (
     <>
-      {/* Step-by-step instructions */}
+      {/* What you'll do */}
       <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 mb-4">
         <h3 className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-3">How to do it</h3>
         <ol className="space-y-3">
@@ -262,90 +285,143 @@ function DemoContent({ exercise, region, onStart }) {
           <ul className="space-y-1.5">
             {exercise.commonMistakes.map((m, i) => (
               <li key={i} className="text-sm text-amber-800 flex items-start gap-2">
-                <span className="text-amber-400 mt-0.5">•</span>{m}
+                <span className="text-amber-400 mt-0.5">&bull;</span>{m}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Cautions */}
-      {exercise.cautions?.length > 0 && (
-        <div className="bg-red-50 rounded-2xl border border-red-100 p-4 mb-4">
-          {exercise.cautions.map((c, i) => (
-            <p key={i} className="text-sm text-red-700 flex items-start gap-2">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 flex-shrink-0 mt-0.5">
-                <circle cx="8" cy="8" r="6" /><path d="M8 5v3M8 10.5h.01" />
-              </svg>
-              {c}
-            </p>
-          ))}
-        </div>
-      )}
-
       {/* Session info */}
       <div className="flex items-center gap-4 text-sm text-[var(--color-text-muted)] mb-6">
-        <span>{exercise.reps} × {exercise.sets} sets</span>
-        <span>~{exercise.duration}s hold</span>
+        <span>{exercise.reps} &times; {exercise.sets} sets</span>
+        {exercise.duration > 0 && <span>~{exercise.duration}s hold</span>}
       </div>
 
-      {/* Start CTA */}
+      {/* Begin CTA */}
       <button
-        onClick={onStart}
+        onClick={onBegin}
         className="w-full py-4 rounded-2xl text-base font-bold bg-[var(--color-mint)] text-white shadow-lg shadow-[var(--color-mint)]/20 transition-all active:scale-[0.98] hover:shadow-xl"
       >
-        Start Exercise
+        Begin Exercise
       </button>
     </>
   );
 }
 
-function PerformContent({ exercise, setCount, timerActive, timeLeft, mins, secs, progress, onToggleTimer, onPain, onComplete, isLast }) {
+function ExecutionContent({
+  exercise, region, currentStep, advanceStep, setCount,
+  holdTime, holdActive, holdProgress, remainingHold,
+  onToggleHold, onPain, onComplete, isLast,
+}) {
+  const allStepsRevealed = currentStep >= exercise.steps.length - 1;
+
   return (
     <>
-      {/* Set & timer */}
+      {/* Progressive step guide */}
       <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-bold text-[var(--color-text)]">Set {setCount} of {exercise.sets}</span>
-          <span className="text-sm text-[var(--color-text-muted)]">{exercise.reps}</span>
-        </div>
-
-        {/* Timer bar */}
-        <div className="w-full h-2 bg-[var(--color-surface)] rounded-full overflow-hidden mb-4">
-          <div className="h-full bg-[var(--color-mint)] rounded-full transition-all duration-1000" style={{ width: `${progress}%` }} />
-        </div>
-
-        {/* Timer display */}
-        <div className="text-center mb-4">
-          <span className={`text-5xl font-mono font-bold tracking-tight ${
-            timeLeft <= 5 && timerActive ? 'text-[var(--color-amber)]' : 'text-[var(--color-text)]'
-          }`}>
-            {mins > 0 ? `${mins}:${secs.toString().padStart(2, '0')}` : secs}
+          <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider">
+            Set {setCount} of {exercise.sets}
           </span>
-          <span className="text-lg text-[var(--color-text-muted)] ml-1">s</span>
+          <span className="text-xs text-[var(--color-text-muted)]">{exercise.reps}</span>
         </div>
 
-        <button
-          onClick={onToggleTimer}
-          className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all ${
-            timerActive
-              ? 'bg-amber-50 text-[var(--color-amber)] border border-amber-200'
-              : 'bg-[var(--color-mint)] text-white'
-          }`}
-        >
-          {timerActive ? 'Pause' : timeLeft === exercise.duration ? 'Start Timer' : 'Resume'}
-        </button>
+        {/* Steps — revealed progressively */}
+        <div className="space-y-3 mb-4">
+          {exercise.steps.map((step, i) => {
+            const isActive = i === currentStep;
+            const isDone = i < currentStep;
+            const isHidden = i > currentStep;
+
+            return (
+              <div
+                key={i}
+                className={`flex gap-3 transition-all duration-300 ${isHidden ? 'opacity-30 scale-[0.97]' : ''}`}
+              >
+                <span className={`flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center transition-colors ${
+                  isDone ? 'bg-[var(--color-mint)] text-white' :
+                  isActive ? `${region.bg} ${region.text} ring-2 ring-[var(--color-mint)]/20` :
+                  'bg-[var(--color-surface)] text-[var(--color-text-muted)]'
+                }`}>
+                  {isDone ? (
+                    <svg viewBox="0 0 12 12" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M2 6l3 3 5-5" />
+                    </svg>
+                  ) : i + 1}
+                </span>
+                <span className={`text-sm leading-relaxed pt-0.5 transition-colors ${
+                  isActive ? 'text-[var(--color-text)] font-medium' : 'text-[var(--color-text-secondary)]'
+                }`}>
+                  {step}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Next step button */}
+        {!allStepsRevealed && (
+          <button
+            onClick={advanceStep}
+            className="w-full py-2.5 rounded-xl text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)] transition-colors"
+          >
+            Next step
+          </button>
+        )}
       </div>
 
-      {/* Current step reminder */}
-      <div className="bg-white rounded-2xl border border-[var(--color-border)] p-4 mb-4">
-        <h4 className="text-xs font-bold text-[var(--color-text-muted)] uppercase mb-2">Quick Reminder</h4>
-        <ul className="space-y-1">
-          {exercise.steps.slice(0, 3).map((s, i) => (
-            <li key={i} className="text-sm text-[var(--color-text-secondary)]">{i + 1}. {s}</li>
-          ))}
-        </ul>
-      </div>
+      {/* Contextual hold timer — embedded, not standalone */}
+      {exercise.duration > 0 && (
+        <div className="bg-white rounded-2xl border border-[var(--color-border)] p-5 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-[var(--color-text)]">
+              {holdActive
+                ? `Hold for ${remainingHold}s more...`
+                : holdTime >= exercise.duration
+                ? 'Hold complete!'
+                : `Hold for ${exercise.duration} seconds`}
+            </span>
+          </div>
+
+          {/* Subtle progress ring */}
+          <div className="flex items-center gap-4">
+            <div className="relative w-16 h-16 flex-shrink-0">
+              <svg viewBox="0 0 64 64" className="w-full h-full -rotate-90">
+                <circle cx="32" cy="32" r="28" fill="none" stroke="var(--color-surface)" strokeWidth="4" />
+                <circle
+                  cx="32" cy="32" r="28"
+                  fill="none"
+                  stroke={holdTime >= exercise.duration ? 'var(--color-mint)' : holdActive ? 'var(--color-mint)' : 'var(--color-border)'}
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 28}`}
+                  strokeDashoffset={`${2 * Math.PI * 28 * (1 - holdProgress / 100)}`}
+                  className="transition-all duration-1000"
+                />
+              </svg>
+              <span className={`absolute inset-0 flex items-center justify-center text-lg font-mono font-bold ${
+                holdActive && remainingHold <= 5 ? 'text-[var(--color-amber)]' : 'text-[var(--color-text)]'
+              }`}>
+                {holdTime}
+              </span>
+            </div>
+
+            <button
+              onClick={onToggleHold}
+              className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${
+                holdActive
+                  ? 'bg-amber-50 text-[var(--color-amber)] border border-amber-200'
+                  : holdTime >= exercise.duration
+                  ? 'bg-[var(--color-mint)]/10 text-[var(--color-mint)] border border-[var(--color-mint)]/20'
+                  : 'bg-[var(--color-mint)] text-white'
+              }`}
+            >
+              {holdActive ? 'Pause' : holdTime >= exercise.duration ? 'Restart Hold' : holdTime > 0 ? 'Resume' : 'Start Hold'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex gap-3">
@@ -353,7 +429,7 @@ function PerformContent({ exercise, setCount, timerActive, timeLeft, mins, secs,
           onClick={onPain}
           className="py-4 px-5 rounded-2xl text-sm font-medium bg-red-50 text-[var(--color-danger)] border border-red-100 transition-all active:scale-[0.98]"
         >
-          I feel pain
+          Pain
         </button>
         <button
           onClick={onComplete}
@@ -377,9 +453,9 @@ function PainReport({ exercise, onContinue, onSkip }) {
             </svg>
           </div>
           <h2 className="text-xl font-display font-bold text-[var(--color-text)] mb-2">Pain Reported</h2>
-          <p className="text-[var(--color-text-secondary)] mb-6">Let's adjust. Here's an easier option:</p>
+          <p className="text-[var(--color-text-secondary)] mb-6">Here's an easier alternative:</p>
           <div className="bg-emerald-50 rounded-2xl p-4 mb-6 text-left border border-emerald-100">
-            <div className="text-sm font-bold text-[var(--color-mint)] mb-1">Easier Alternative</div>
+            <div className="text-sm font-bold text-[var(--color-mint)] mb-1">Easier Version</div>
             <p className="text-sm text-[var(--color-text-secondary)]">{exercise.regression}</p>
           </div>
           <div className="space-y-3">

@@ -3,19 +3,22 @@ import { useReducer, useEffect } from 'react';
 const STORAGE_KEY = 'physioguide_state';
 
 const defaultState = {
-  screen: 'onboarding', // onboarding | dashboard | plan | player | feedback | progress
+  screen: 'onboarding', // onboarding | dashboard | plan | player | feedback | summary | progress
   onboardingStep: 0,
   profile: null, // { injuryArea, painLevel, mobilityLevel }
   currentWeek: 1,
   streak: 0,
   lastSessionDate: null,
-  completedSessions: [], // [{ date, exercises, painBefore, painAfter }]
+  completedSessions: [], // [{ date, duration, exercises, painBefore, painAfter, week }]
   painLog: [], // [{ date, level }]
   session: {
     active: false,
     exerciseIndex: 0,
-    completedExercises: [], // [{ id, feedback }]
+    startTime: null,
+    completedExercises: [], // [{ id, feedback, duration, startedAt, completedAt }]
   },
+  // Post-session summary data (kept until user navigates away)
+  lastSummary: null, // { exercises, totalDuration, feedbackCounts, overallFeeling }
   todayCompleted: false,
 };
 
@@ -24,12 +27,12 @@ function loadState() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      // Reset session state on load
       return {
         ...defaultState,
         ...parsed,
         screen: parsed.profile ? 'dashboard' : 'onboarding',
-        session: { active: false, exerciseIndex: 0, completedExercises: [] },
+        session: { active: false, exerciseIndex: 0, startTime: null, completedExercises: [] },
+        lastSummary: null,
       };
     }
   } catch (e) { /* ignore */ }
@@ -48,7 +51,6 @@ function calculateStreak(sessions, lastDate) {
     (a, b) => new Date(b) - new Date(a)
   );
   let checkDate = new Date(today);
-  // If no session today, start from yesterday
   if (dates[0] !== today) {
     checkDate = new Date(yesterday);
   }
@@ -90,18 +92,45 @@ function reducer(state, action) {
       return {
         ...state,
         screen: 'player',
-        session: { active: true, exerciseIndex: 0, completedExercises: [] },
+        session: {
+          active: true,
+          exerciseIndex: 0,
+          startTime: Date.now(),
+          completedExercises: [],
+        },
+      };
+
+    case 'START_EXERCISE':
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          currentExerciseStart: Date.now(),
+        },
       };
 
     case 'COMPLETE_EXERCISE': {
+      const now = Date.now();
+      const exerciseDuration = state.session.currentExerciseStart
+        ? Math.round((now - state.session.currentExerciseStart) / 1000)
+        : 0;
       const completed = [
         ...state.session.completedExercises,
-        { id: action.exerciseId, feedback: action.feedback },
+        {
+          id: action.exerciseId,
+          feedback: action.feedback,
+          duration: exerciseDuration,
+          completedAt: new Date().toISOString(),
+        },
       ];
       return {
         ...state,
         screen: 'feedback',
-        session: { ...state.session, completedExercises: completed },
+        session: {
+          ...state.session,
+          completedExercises: completed,
+          currentExerciseStart: null,
+        },
       };
     }
 
@@ -110,14 +139,37 @@ function reducer(state, action) {
       return {
         ...state,
         screen: 'player',
-        session: { ...state.session, exerciseIndex: nextIndex },
+        session: {
+          ...state.session,
+          exerciseIndex: nextIndex,
+          currentExerciseStart: Date.now(),
+        },
       };
     }
 
     case 'COMPLETE_SESSION': {
       const now = new Date().toISOString();
+      const sessionDuration = state.session.startTime
+        ? Math.round((Date.now() - state.session.startTime) / 1000)
+        : 0;
+
+      // Build feedback counts
+      const feedbackCounts = { easy: 0, normal: 0, hard: 0, painful: 0 };
+      state.session.completedExercises.forEach(e => {
+        if (feedbackCounts[e.feedback] !== undefined) feedbackCounts[e.feedback]++;
+      });
+
+      const summary = {
+        exercises: state.session.completedExercises,
+        totalDuration: sessionDuration,
+        feedbackCounts,
+        overallFeeling: null,
+        date: now,
+      };
+
       const newSession = {
         date: now,
+        duration: sessionDuration,
         exercises: state.session.completedExercises,
         week: state.currentWeek,
       };
@@ -125,22 +177,30 @@ function reducer(state, action) {
       const todaysSessions = sessions.filter(s => isSameDay(s.date, now));
       const streak = calculateStreak(sessions, now);
 
-      // Auto-advance week after 3 completed sessions in current week
       const weekSessions = sessions.filter(s => s.week === state.currentWeek);
       const nextWeek = weekSessions.length >= 3 && state.currentWeek < 4
         ? state.currentWeek + 1 : state.currentWeek;
 
       return {
         ...state,
-        screen: 'dashboard',
-        session: { active: false, exerciseIndex: 0, completedExercises: [] },
+        screen: 'summary',
+        session: { active: false, exerciseIndex: 0, startTime: null, completedExercises: [] },
         completedSessions: sessions,
         lastSessionDate: now,
         streak,
         todayCompleted: todaysSessions.length > 0,
         currentWeek: nextWeek,
+        lastSummary: summary,
       };
     }
+
+    case 'SET_OVERALL_FEELING':
+      return {
+        ...state,
+        lastSummary: state.lastSummary
+          ? { ...state.lastSummary, overallFeeling: action.feeling }
+          : null,
+      };
 
     case 'LOG_PAIN':
       return {
@@ -162,7 +222,7 @@ export default function useAppState() {
 
   // Persist to localStorage on state change
   useEffect(() => {
-    const { screen, session, ...persist } = state;
+    const { screen, session, lastSummary, ...persist } = state;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
   }, [state]);
 
@@ -170,7 +230,7 @@ export default function useAppState() {
   useEffect(() => {
     if (state.lastSessionDate && isSameDay(state.lastSessionDate, new Date())) {
       if (!state.todayCompleted) {
-        dispatch({ type: 'COMPLETE_SESSION' }); // just to set flag
+        dispatch({ type: 'SET_SCREEN', screen: 'dashboard' });
       }
     }
   }, []);
